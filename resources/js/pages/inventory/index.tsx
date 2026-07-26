@@ -2,7 +2,8 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/data-table';
 import { Plus, Package } from 'lucide-react';
-import { index as inventoryIndex, show } from '@/routes/inventory';
+import { index as inventoryIndex, show as inventoryShow } from '@/routes/inventory';
+import { index as productIndex, create as productCreate, show as productShow } from '@/routes/products';
 
 interface Product {
     id: number;
@@ -26,6 +27,10 @@ export default function ProductIndex({ products }: Props) {
         if (confirm('Are you sure you want to delete this product?')) {
             destroy(`/products/${product.id}`);
         }
+    };
+
+    const handleEdit = (product: Product) => {
+        window.location.href = `/products/${product.id}/edit`;
     };
 
     const formatCurrency = (amount: number) => {
@@ -95,14 +100,12 @@ export default function ProductIndex({ products }: Props) {
         {
             label: 'View',
             onClick: (product: Product) => {
-                window.location.href = show(product.id).url;
+                window.location.href = inventoryShow(product.id).url;
             },
         },
         {
             label: 'Edit',
-            onClick: (product: Product) => {
-                window.location.href = `/products/${product.id}/edit`;
-            },
+            onClick: handleEdit,
         },
         {
             label: 'Delete',
@@ -122,7 +125,7 @@ export default function ProductIndex({ products }: Props) {
                             Manage your product inventory
                         </p>
                     </div>
-                    <Link href="/products/create">
+                    <Link href={productCreate().url}>
                         <Button>
                             <Plus className="h-4 w-4 mr-2" />
                             Add Product
@@ -142,12 +145,12 @@ export default function ProductIndex({ products }: Props) {
                         action: {
                             label: 'Add Product',
                             onClick: () => {
-                                window.location.href = '/products/create';
+                                window.location.href = productCreate().url;
                             },
                         },
                     }}
                     onRowClick={(product) => {
-                        window.location.href = show(product.id).url;
+                        window.location.href = inventoryShow(product.id).url;
                     }}
                 />
             </div>

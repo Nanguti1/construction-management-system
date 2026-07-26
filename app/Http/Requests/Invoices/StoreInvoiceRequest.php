@@ -16,7 +16,7 @@ class StoreInvoiceRequest extends FormRequest
         return [
             'customer_id' => ['required', 'exists:customers,id'],
             'quotation_id' => ['nullable', 'exists:quotations,id'],
-            'invoice_number' => ['required', 'string', 'max:50'],
+            'invoice_number' => ['nullable', 'string', 'max:50'],
             'invoice_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after:invoice_date'],
             'status' => ['sometimes', 'required', 'string', 'in:draft,pending,partially_paid,paid,cancelled'],

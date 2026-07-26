@@ -7,8 +7,8 @@ class InvoiceData
     public function __construct(
         public readonly string $customerId,
         public readonly ?string $quotationId,
-        public readonly string $invoiceNumber,
-        public readonly string $invoiceDate,
+        public readonly ?string $invoiceNumber,
+        public readonly ?string $invoiceDate,
         public readonly ?string $dueDate,
         public readonly string $status,
         public readonly ?string $notes,
@@ -18,15 +18,15 @@ class InvoiceData
     public static function fromArray(array $data): self
     {
         $items = array_map(
-            fn($item) => ItemData::fromArray($item),
+            fn ($item) => ItemData::fromArray($item),
             $data['items'] ?? []
         );
 
         return new self(
             customerId: $data['customer_id'],
             quotationId: $data['quotation_id'] ?? null,
-            invoiceNumber: $data['invoice_number'],
-            invoiceDate: $data['invoice_date'],
+            invoiceNumber: $data['invoice_number'] ?? null,
+            invoiceDate: $data['invoice_date'] ?? null,
             dueDate: $data['due_date'] ?? null,
             status: $data['status'] ?? 'draft',
             notes: $data['notes'] ?? null,
@@ -44,7 +44,7 @@ class InvoiceData
             'due_date' => $this->dueDate,
             'status' => $this->status,
             'notes' => $this->notes,
-            'items' => array_map(fn($item) => $item->toArray(), $this->items),
+            'items' => array_map(fn ($item) => $item->toArray(), $this->items),
         ];
     }
 }

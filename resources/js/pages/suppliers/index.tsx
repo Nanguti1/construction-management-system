@@ -6,7 +6,6 @@ import { index, create, show, edit } from '@/routes/suppliers';
 
 interface Supplier {
     id: number;
-    name: string;
     company_name: string | null;
     phone: string | null;
     email: string | null;
@@ -30,16 +29,11 @@ export default function SupplierIndex({ suppliers }: Props) {
 
     const columns = [
         {
-            key: 'name',
-            label: 'Name',
+            key: 'company_name',
+            label: 'Company Name',
             sortable: true,
             render: (supplier: Supplier) => (
-                <div>
-                    <div className="font-medium">{supplier.name}</div>
-                    {supplier.company_name && (
-                        <div className="text-sm text-muted-foreground">{supplier.company_name}</div>
-                    )}
-                </div>
+                <div className="font-medium">{supplier.company_name}</div>
             ),
         },
         {
@@ -130,7 +124,7 @@ export default function SupplierIndex({ suppliers }: Props) {
                     columns={columns}
                     actions={actions}
                     searchable
-                    searchableFields={['name', 'company_name', 'email', 'phone']}
+                    searchableFields={['company_name', 'email', 'phone']}
                     emptyState={{
                         title: 'No suppliers found',
                         description: 'Get started by adding your first supplier',

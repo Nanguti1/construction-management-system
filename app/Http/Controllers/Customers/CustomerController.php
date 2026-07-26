@@ -29,14 +29,14 @@ class CustomerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('Customers/Index', [
+        return Inertia::render('customers/index', [
             'customers' => $customers,
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('Customers/Create');
+        return Inertia::render('customers/create');
     }
 
     public function store(StoreCustomerRequest $request): RedirectResponse
@@ -54,14 +54,14 @@ class CustomerController extends Controller
             $query->orderBy('invoice_date', 'desc')->limit(10);
         }]);
 
-        return Inertia::render('Customers/Show', [
+        return Inertia::render('customers/show', [
             'customer' => $customer,
         ]);
     }
 
     public function edit(Customer $customer): Response
     {
-        return Inertia::render('Customers/Edit', [
+        return Inertia::render('customers/edit', [
             'customer' => $customer,
         ]);
     }

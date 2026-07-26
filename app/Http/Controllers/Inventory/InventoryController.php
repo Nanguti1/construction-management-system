@@ -27,10 +27,11 @@ class InventoryController extends Controller
             ->get()
             ->map(function ($product) {
                 $product->current_stock = $this->inventoryService->getProductStock($product->id);
+
                 return $product;
             });
 
-        return Inertia::render('Inventory/Index', [
+        return Inertia::render('inventory/index', [
             'products' => $products,
         ]);
     }
@@ -40,7 +41,7 @@ class InventoryController extends Controller
         $product->load('category');
         $movements = $this->inventoryService->getProductMovements($product->id, 50);
 
-        return Inertia::render('Inventory/Show', [
+        return Inertia::render('inventory/show', [
             'product' => $product,
             'movements' => $movements,
         ]);
@@ -58,11 +59,24 @@ class InventoryController extends Controller
     public function movements(): Response
     {
         $movements = StockMovement::query()
-            ->with(['product', 'user', 'movable'])
+            ->with(['product', 'createdBy'])
             ->orderBy('created_at', 'desc')
-            ->paginate(50);
+            ->get()
+            ->map(function ($movement) {
+                return [
+                    'id' => $movement->id,
+                    'product_name' => $movement->product->name ?? 'N/A',
+                    'product_sku' => $movement->product->sku ?? 'N/A',
+                    'type' => $movement->movement_type,
+                    'quantity' => $movement->quantity,
+                    'reference_type' => $movement->reference_type,
+                    'reference_number' => $movement->reference_id,
+                    'notes' => $movement->notes,
+                    'created_at' => $movement->created_at,
+                ];
+            });
 
-        return Inertia::render('Inventory/Movements', [
+        return Inertia::render('inventory/movements', [
             'movements' => $movements,
         ]);
     }

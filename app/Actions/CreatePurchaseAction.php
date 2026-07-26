@@ -36,7 +36,7 @@ class CreatePurchaseAction
 
             foreach ($data->items as $itemData) {
                 $this->createPurchaseItem($purchase, $itemData);
-                
+
                 // Create stock movement for received items
                 if ($data->status === PurchaseStatus::RECEIVED->value) {
                     $this->inventoryManager->recordPurchaseMovement(

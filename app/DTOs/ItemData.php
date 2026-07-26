@@ -36,6 +36,10 @@ class ItemData
 
     public function lineTotal(): float
     {
-        return ($this->unitPrice * $this->quantity) - $this->discount + $this->tax;
+        $subtotal = $this->unitPrice * $this->quantity;
+        $discountAmount = $subtotal * ($this->discount / 100);
+        $taxAmount = ($subtotal - $discountAmount) * ($this->tax / 100);
+
+        return $subtotal - $discountAmount + $taxAmount;
     }
 }

@@ -13,7 +13,7 @@ class ReceiptController extends Controller
     {
         $receipt->load(['payment.invoice.customer', 'payment.invoice.invoiceItems']);
 
-        return Inertia::render('Payments/Receipts/Show', [
+        return Inertia::render('receipts/show', [
             'receipt' => $receipt,
         ]);
     }

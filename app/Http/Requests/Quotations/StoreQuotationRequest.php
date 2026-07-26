@@ -15,9 +15,9 @@ class StoreQuotationRequest extends FormRequest
     {
         return [
             'customer_id' => ['required', 'exists:customers,id'],
-            'quotation_number' => ['required', 'string', 'max:50'],
-            'date' => ['required', 'date'],
-            'expiry_date' => ['nullable', 'date', 'after:date'],
+            'quotation_number' => ['nullable', 'string', 'max:50'],
+            'quotation_date' => ['required', 'date'],
+            'expiry_date' => ['nullable', 'date', 'after:quotation_date'],
             'status' => ['sometimes', 'required', 'string', 'in:draft,sent,accepted,rejected,expired'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],

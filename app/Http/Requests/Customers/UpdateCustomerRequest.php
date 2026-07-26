@@ -3,13 +3,12 @@
 namespace App\Http\Requests\Customers;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateCustomerRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->user()->can('update customers');
+        return auth()->user()->can('edit customers');
     }
 
     public function rules(): array

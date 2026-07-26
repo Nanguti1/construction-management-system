@@ -201,7 +201,7 @@ export default function InvoiceShow({ invoice }: Props) {
                     </CardHeader>
                     <CardContent>
                         <DataTable
-                            data={invoice.items}
+                            data={invoice.items || []}
                             columns={itemColumns}
                             searchable={false}
                             emptyState={{

@@ -15,11 +15,12 @@ trait HasStatusTransitions
 
     public function transitionTo(string $newStatus): bool
     {
-        if (!$this->canTransitionTo($newStatus)) {
+        if (! $this->canTransitionTo($newStatus)) {
             return false;
         }
 
         $this->setStatus($newStatus);
+
         return true;
     }
 

@@ -5,7 +5,6 @@ namespace App\Actions;
 use App\Concerns\CalculatesTotals;
 use App\DTOs\ItemData;
 use App\DTOs\QuotationData;
-use App\Enums\QuotationStatus;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
 use App\Support\DocumentNumberGenerator;
@@ -19,13 +18,19 @@ class CreateQuotationAction
     public function execute(QuotationData $data): Quotation
     {
         return DB::transaction(function () use ($data) {
+            $totals = $this->calculateTotals($data->items);
+
             $quotation = Quotation::create([
                 'customer_id' => $data->customerId,
-                'quotation_number' => $data->quotationNumber ?: DocumentNumberGenerator::generateQuotationNumber(),
-                'date' => $data->date,
+                'quotation_number' => $data->quotationNumber ?? DocumentNumberGenerator::generateQuotationNumber(),
+                'quotation_date' => $data->date,
                 'expiry_date' => $data->expiryDate,
                 'status' => $data->status,
                 'notes' => $data->notes,
+                'subtotal' => $totals['subtotal'],
+                'tax' => $totals['tax'],
+                'discount' => $totals['discount'],
+                'grand_total' => $totals['grand_total'],
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);

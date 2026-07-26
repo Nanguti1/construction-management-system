@@ -8,12 +8,10 @@ import { useForm } from '@inertiajs/react';
 
 interface Supplier {
     id: number;
-    name: string;
     company_name: string | null;
     phone: string | null;
     email: string | null;
     address: string | null;
-    tax_pin: string | null;
     notes: string | null;
     is_active: boolean;
     purchases: Array<{
@@ -84,7 +82,7 @@ export default function SupplierShow({ supplier }: Props) {
 
     return (
         <>
-            <Head title={`Supplier - ${supplier.name}`} />
+            <Head title={`Supplier - ${supplier.company_name}`} />
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -94,10 +92,7 @@ export default function SupplierShow({ supplier }: Props) {
                                 Back to Suppliers
                             </Button>
                         </Link>
-                        <h1 className="text-3xl font-bold tracking-tight mt-2">{supplier.name}</h1>
-                        <p className="text-muted-foreground">
-                            {supplier.company_name && `Company: ${supplier.company_name}`}
-                        </p>
+                        <h1 className="text-3xl font-bold tracking-tight mt-2">{supplier.company_name}</h1>
                     </div>
                     <div className="flex gap-2">
                         <Link href={edit(supplier.id).url}>
@@ -135,12 +130,6 @@ export default function SupplierShow({ supplier }: Props) {
                                 <div className="flex items-start gap-2">
                                     <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
                                     <span>{supplier.address}</span>
-                                </div>
-                            )}
-                            {supplier.tax_pin && (
-                                <div>
-                                    <span className="text-sm text-muted-foreground">Tax PIN:</span>
-                                    <span className="ml-2">{supplier.tax_pin}</span>
                                 </div>
                             )}
                         </CardContent>

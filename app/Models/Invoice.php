@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Concerns\HasInventoryMovements;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use App\Concerns\HasInventoryMovements;
 
 class Invoice extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids, HasInventoryMovements;
+    use HasFactory, HasInventoryMovements, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'customer_id',
@@ -20,6 +20,10 @@ class Invoice extends Model
         'due_date',
         'status',
         'notes',
+        'subtotal',
+        'tax',
+        'discount',
+        'grand_total',
         'created_by',
         'updated_by',
     ];
@@ -30,6 +34,14 @@ class Invoice extends Model
             'invoice_date' => 'date',
             'due_date' => 'date',
         ];
+    }
+
+    public function getOutstandingBalanceAttribute(): float
+    {
+        $grandTotal = $this->grand_total ?? 0;
+        $paidAmount = $this->payments()->sum('amount');
+
+        return $grandTotal - $paidAmount;
     }
 
     public function customer()

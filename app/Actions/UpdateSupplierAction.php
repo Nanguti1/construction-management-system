@@ -18,6 +18,7 @@ class UpdateSupplierAction
                 'phone' => $data->phone,
                 'email' => $data->email,
                 'address' => $data->address,
+                'tax_pin' => $data->taxPin,
                 'notes' => $data->notes,
                 'is_active' => $data->isActive,
                 'updated_by' => auth()->id(),

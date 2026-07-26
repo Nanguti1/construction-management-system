@@ -11,14 +11,14 @@ import { useState, useEffect } from 'react';
 
 interface Supplier {
     id: number;
-    name: string;
+    company_name: string;
 }
 
 interface Product {
     id: number;
     name: string;
     sku: string;
-    selling_price: number;
+    cost_price: number;
 }
 
 interface PurchaseItem {
@@ -60,7 +60,7 @@ export default function PurchaseEdit({ purchase, suppliers, products }: Props) {
     }, [items]);
 
     const addItem = () => {
-        const newItems = [...items, { product_id: '', quantity: 1, unit_cost: 0, discount: 0, tax: 0 }];
+        const newItems = [...items, { product_id: '', quantity: 1, unit_cost: '', discount: 0, tax: 0 }];
         setItems(newItems);
     };
 
@@ -72,12 +72,22 @@ export default function PurchaseEdit({ purchase, suppliers, products }: Props) {
     const updateItem = (index: number, field: string, value: any) => {
         const newItems = [...items];
         newItems[index] = { ...newItems[index], [field]: value };
+
+        // Auto-fill unit cost when product is selected
+        if (field === 'product_id' && value) {
+            const product = products.find(p => p.id.toString() === value);
+            if (product) {
+                newItems[index].unit_cost = product.cost_price.toString();
+            }
+        }
+
         setItems(newItems);
     };
 
     const calculateTotal = () => {
         return items.reduce((total, item) => {
-            const subtotal = item.quantity * item.unit_cost;
+            const unitCost = parseFloat(item.unit_cost) || 0;
+            const subtotal = item.quantity * unitCost;
             const discount = subtotal * (item.discount / 100);
             const tax = (subtotal - discount) * (item.tax / 100);
             return total + subtotal - discount + tax;
@@ -89,12 +99,12 @@ export default function PurchaseEdit({ purchase, suppliers, products }: Props) {
         put(update(purchase.id).url);
     };
 
-    const supplierOptions = suppliers.map(s => ({ value: s.id.toString(), label: s.name }));
+    const supplierOptions = suppliers.map(s => ({ value: s.id.toString(), label: s.company_name }));
     const productOptions = products.map(p => ({ value: p.id.toString(), label: `${p.name} (${p.sku})` }));
 
     const statusOptions = [
         { value: 'pending', label: 'Pending' },
-        { value: 'completed', label: 'Completed' },
+        { value: 'received', label: 'Received' },
         { value: 'cancelled', label: 'Cancelled' },
     ];
 
@@ -201,7 +211,7 @@ export default function PurchaseEdit({ purchase, suppliers, products }: Props) {
                                             <FormCurrency
                                                 label="Unit Cost"
                                                 value={item.unit_cost}
-                                                onChange={(e) => updateItem(index, 'unit_cost', parseFloat(e.target.value))}
+                                                onChange={(e) => updateItem(index, 'unit_cost', e.target.value)}
                                                 error={errors.items?.[index]?.unit_cost}
                                                 id={`unit_cost_${index}`}
                                                 required

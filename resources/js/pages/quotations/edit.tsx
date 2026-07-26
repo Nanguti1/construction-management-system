@@ -7,7 +7,7 @@ import { FormDate } from '@/components/form/form-date';
 import { FormCurrency } from '@/components/form/form-currency';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { index, update, show } from '@/routes/quotations';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface Customer {
     id: number;
@@ -24,7 +24,7 @@ interface Product {
 interface QuotationItem {
     product_id: string;
     quantity: number;
-    unit_price: number;
+    unit_price: string;
     discount: number;
     tax: number;
 }
@@ -46,7 +46,7 @@ interface Props {
 }
 
 export default function QuotationEdit({ quotation, customers, products }: Props) {
-    const [items, setItems] = useState<QuotationItem[]>(quotation.items);
+    const [items, setItems] = useState<QuotationItem[]>(quotation.items || []);
 
     const { data, setData, put, processing, errors } = useForm({
         customer_id: quotation.customer_id.toString(),
@@ -57,29 +57,38 @@ export default function QuotationEdit({ quotation, customers, products }: Props)
         items: items,
     });
 
-    useEffect(() => {
-        setData('items', items);
-    }, [items]);
-
     const addItem = () => {
-        const newItems = [...items, { product_id: '', quantity: 1, unit_price: 0, discount: 0, tax: 0 }];
+        const newItems = [...items, { product_id: '', quantity: 1, unit_price: '', discount: 0, tax: 0 }];
         setItems(newItems);
+        setData('items', newItems);
     };
 
     const removeItem = (index: number) => {
         const newItems = items.filter((_, i) => i !== index);
         setItems(newItems);
+        setData('items', newItems);
     };
 
     const updateItem = (index: number, field: string, value: any) => {
         const newItems = [...items];
         newItems[index] = { ...newItems[index], [field]: value };
+
+        // Auto-fill unit price when product is selected
+        if (field === 'product_id' && value) {
+            const product = products.find(p => p.id.toString() === value);
+            if (product) {
+                newItems[index].unit_price = product.selling_price.toString();
+            }
+        }
+
         setItems(newItems);
+        setData('items', newItems);
     };
 
     const calculateTotal = () => {
         return items.reduce((total, item) => {
-            const subtotal = item.quantity * item.unit_price;
+            const unitPrice = parseFloat(item.unit_price) || 0;
+            const subtotal = item.quantity * unitPrice;
             const discount = subtotal * (item.discount / 100);
             const tax = (subtotal - discount) * (item.tax / 100);
             return total + subtotal - discount + tax;
@@ -216,7 +225,7 @@ export default function QuotationEdit({ quotation, customers, products }: Props)
                                             <FormCurrency
                                                 label="Unit Price"
                                                 value={item.unit_price}
-                                                onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value))}
+                                                onChange={(e) => updateItem(index, 'unit_price', e.target.value)}
                                                 error={errors.items?.[index]?.unit_price}
                                                 id={`unit_price_${index}`}
                                                 required

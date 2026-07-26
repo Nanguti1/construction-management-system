@@ -18,6 +18,7 @@ class CreateSupplierAction
                 'phone' => $data->phone,
                 'email' => $data->email,
                 'address' => $data->address,
+                'tax_pin' => $data->taxPin,
                 'notes' => $data->notes,
                 'is_active' => $data->isActive,
                 'created_by' => auth()->id(),

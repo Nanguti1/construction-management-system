@@ -16,7 +16,7 @@ class UpdatePurchaseAction
         return DB::transaction(function () use ($purchase, $data) {
             $purchase->update([
                 'supplier_id' => $data->supplierId,
-                'purchase_number' => $data->purchaseNumber,
+                'purchase_number' => $data->purchaseNumber ?? $purchase->purchase_number,
                 'purchase_date' => $data->purchaseDate,
                 'status' => $data->status,
                 'notes' => $data->notes,

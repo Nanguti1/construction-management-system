@@ -8,7 +8,7 @@ class UpdateSupplierRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->user()->can('update suppliers');
+        return auth()->user()->can('edit suppliers');
     }
 
     public function rules(): array
@@ -19,6 +19,7 @@ class UpdateSupplierRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
+            'tax_pin' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['boolean'],
         ];

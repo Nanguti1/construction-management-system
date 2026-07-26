@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class InvoiceItem extends Model
 {
@@ -39,5 +39,14 @@ class InvoiceItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function getCalculatedLineTotalAttribute(): float
+    {
+        $subtotal = $this->unit_price * $this->quantity;
+        $discountAmount = $subtotal * ($this->discount / 100);
+        $taxAmount = ($subtotal - $discountAmount) * ($this->tax / 100);
+
+        return $subtotal - $discountAmount + $taxAmount;
     }
 }

@@ -8,16 +8,16 @@ class UpdateQuotationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->user()->can('update quotations');
+        return auth()->user()->can('edit quotations');
     }
 
     public function rules(): array
     {
         return [
             'customer_id' => ['sometimes', 'required', 'exists:customers,id'],
-            'quotation_number' => ['sometimes', 'required', 'string', 'max:50'],
-            'date' => ['sometimes', 'required', 'date'],
-            'expiry_date' => ['nullable', 'date', 'after:date'],
+            'quotation_number' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'quotation_date' => ['sometimes', 'required', 'date'],
+            'expiry_date' => ['nullable', 'date', 'after:quotation_date'],
             'status' => ['sometimes', 'required', 'string', 'in:draft,sent,accepted,rejected,expired'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['sometimes', 'required', 'array', 'min:1'],

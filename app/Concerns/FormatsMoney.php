@@ -11,6 +11,6 @@ trait FormatsMoney
 
     protected function formatMoneyWithCurrency(float $amount, string $currency = '$'): string
     {
-        return $currency . $this->formatMoney($amount);
+        return $currency.$this->formatMoney($amount);
     }
 }

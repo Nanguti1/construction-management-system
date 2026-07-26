@@ -6,9 +6,8 @@ enum InvoiceStatus: string
 {
     case DRAFT = 'draft';
     case PENDING = 'pending';
-    case PARTIALLY_PAID = 'partial';
+    case PARTIALLY_PAID = 'partially_paid';
     case PAID = 'paid';
-    case OVERDUE = 'overdue';
     case CANCELLED = 'cancelled';
 
     public function label(): string
@@ -18,14 +17,13 @@ enum InvoiceStatus: string
             self::PENDING => 'Pending',
             self::PARTIALLY_PAID => 'Partially Paid',
             self::PAID => 'Paid',
-            self::OVERDUE => 'Overdue',
             self::CANCELLED => 'Cancelled',
         };
     }
 
     public function canBePaid(): bool
     {
-        return in_array($this, [self::PENDING, self::PARTIALLY_PAID]);
+        return in_array($this, [self::DRAFT, self::PENDING, self::PARTIALLY_PAID]);
     }
 
     public function canBeCancelled(): bool

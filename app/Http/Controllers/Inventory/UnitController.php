@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProductUnit;
+use App\Http\Requests\StoreUnitRequest;
+use App\Http\Requests\UpdateUnitRequest;
+use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -12,52 +14,70 @@ class UnitController extends Controller
 {
     public function index(): Response
     {
-        $units = ProductUnit::query()
+        $units = Unit::query()
             ->withCount('products')
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('Inventory/Units/Index', [
+        return Inertia::render('inventory/units/index', [
             'units' => $units,
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('Inventory/Units/Create');
+        return Inertia::render('inventory/units/create');
     }
 
-    public function store(): RedirectResponse
+    public function store(StoreUnitRequest $request): RedirectResponse
     {
-        // Implementation would go here
+        $validated = $request->validated();
+
+        Unit::create([
+            'name' => $validated['name'],
+            'abbreviation' => $validated['abbreviation'],
+            'description' => $validated['description'] ?? null,
+            'is_active' => $validated['is_active'] ?? true,
+            'created_by' => auth()->id(),
+        ]);
+
         return redirect()->route('units.index')
             ->with('success', 'Unit created successfully.');
     }
 
-    public function show(ProductUnit $unit): Response
+    public function show(Unit $unit): Response
     {
         $unit->load('products');
 
-        return Inertia::render('Inventory/Units/Show', [
+        return Inertia::render('inventory/units/show', [
             'unit' => $unit,
         ]);
     }
 
-    public function edit(ProductUnit $unit): Response
+    public function edit(Unit $unit): Response
     {
-        return Inertia::render('Inventory/Units/Edit', [
+        return Inertia::render('inventory/units/edit', [
             'unit' => $unit,
         ]);
     }
 
-    public function update(ProductUnit $unit): RedirectResponse
+    public function update(UpdateUnitRequest $request, Unit $unit): RedirectResponse
     {
-        // Implementation would go here
+        $validated = $request->validated();
+
+        $unit->update([
+            'name' => $validated['name'],
+            'abbreviation' => $validated['abbreviation'],
+            'description' => $validated['description'] ?? null,
+            'is_active' => $validated['is_active'] ?? true,
+            'updated_by' => auth()->id(),
+        ]);
+
         return redirect()->route('units.index')
             ->with('success', 'Unit updated successfully.');
     }
 
-    public function destroy(ProductUnit $unit): RedirectResponse
+    public function destroy(Unit $unit): RedirectResponse
     {
         $unit->delete();
 

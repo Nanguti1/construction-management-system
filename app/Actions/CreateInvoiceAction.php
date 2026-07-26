@@ -24,14 +24,20 @@ class CreateInvoiceAction
     public function execute(InvoiceData $data): Invoice
     {
         return DB::transaction(function () use ($data) {
+            $totals = $this->calculateTotals($data->items);
+
             $invoice = Invoice::create([
                 'customer_id' => $data->customerId,
                 'quotation_id' => $data->quotationId,
-                'invoice_number' => $data->invoiceNumber,
+                'invoice_number' => $data->invoiceNumber ?? DocumentNumberGenerator::generateInvoiceNumber(),
                 'invoice_date' => $data->invoiceDate,
                 'due_date' => $data->dueDate,
                 'status' => $data->status,
                 'notes' => $data->notes,
+                'subtotal' => $totals['subtotal'],
+                'tax' => $totals['tax'],
+                'discount' => $totals['discount'],
+                'grand_total' => $totals['grand_total'],
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);

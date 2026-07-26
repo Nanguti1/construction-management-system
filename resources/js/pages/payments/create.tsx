@@ -35,7 +35,7 @@ export default function PaymentCreate({ invoices }: Props) {
         post(store().url);
     };
 
-    const invoiceOptions = invoices
+    const invoiceOptions = (invoices || [])
         .filter(inv => inv.outstanding_balance > 0)
         .map(inv => ({
             value: inv.id.toString(),
@@ -47,8 +47,7 @@ export default function PaymentCreate({ invoices }: Props) {
         { value: 'bank_transfer', label: 'Bank Transfer' },
         { value: 'check', label: 'Check' },
         { value: 'credit_card', label: 'Credit Card' },
-        { value: 'debit_card', label: 'Debit Card' },
-        { value: 'other', label: 'Other' },
+        { value: 'mobile_money', label: 'Mobile Money' },
     ];
 
     return (

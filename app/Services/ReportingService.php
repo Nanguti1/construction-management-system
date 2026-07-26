@@ -10,20 +10,21 @@ use App\Models\Purchase;
 use App\Models\Quotation;
 use App\Models\StockMovement;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class ReportingService
 {
     public function getSalesReport(Carbon $startDate, Carbon $endDate): array
     {
         $invoices = Invoice::whereBetween('invoice_date', [$startDate, $endDate])
-            ->with('customer', 'invoiceItems')
+            ->with('customer', 'invoiceItems', 'payments')
             ->get();
 
         $totalSales = $invoices->sum('grand_total');
         $totalPayments = Payment::whereBetween('payment_date', [$startDate, $endDate])
             ->sum('amount');
-        $outstandingBalance = $invoices->sum('outstanding_balance');
+        $outstandingBalance = $invoices->sum(function ($invoice) {
+            return $invoice->outstanding_balance;
+        });
 
         return [
             'total_sales' => $totalSales,

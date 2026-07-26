@@ -26,6 +26,7 @@ import {
     SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { movements } from '@/routes/inventory';
 import type { NavItem } from '@/types';
 const mainNavItems: NavItem[] = [
     {
@@ -81,14 +82,6 @@ export function AppSidebar() {
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
-                                <Link href="/inventory" prefetch>
-                                    <Package className="h-4 w-4" />
-                                    <span>Products</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
                                 <Link href="/categories" prefetch>
                                     <Package className="h-4 w-4" />
                                     <span>Categories</span>
@@ -105,7 +98,23 @@ export function AppSidebar() {
                         </SidebarMenuItem>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
-                                <Link href="/inventory/movements" prefetch>
+                                <Link href="/products" prefetch>
+                                    <Package className="h-4 w-4" />
+                                    <span>Products</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <Link href="/inventory" prefetch>
+                                    <Package className="h-4 w-4" />
+                                    <span>Stock Overview</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <Link href={movements().url} prefetch>
                                     <Package className="h-4 w-4" />
                                     <span>Stock Movements</span>
                                 </Link>

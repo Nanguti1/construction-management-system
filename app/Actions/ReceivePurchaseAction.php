@@ -17,7 +17,7 @@ class ReceivePurchaseAction
     public function execute(Purchase $purchase): Purchase
     {
         return DB::transaction(function () use ($purchase) {
-            if (!in_array($purchase->status, [PurchaseStatus::PENDING->value, PurchaseStatus::PARTIAL->value])) {
+            if (! in_array($purchase->status, [PurchaseStatus::PENDING->value, PurchaseStatus::PARTIAL->value])) {
                 throw new \Exception('Purchase cannot be received in its current status');
             }
 

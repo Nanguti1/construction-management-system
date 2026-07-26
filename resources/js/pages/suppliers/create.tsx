@@ -9,7 +9,6 @@ import { index, store } from '@/routes/suppliers';
 
 export default function SupplierCreate() {
     const { data, setData, post, processing, errors } = useForm({
-        name: '',
         company_name: '',
         phone: '',
         email: '',
@@ -50,20 +49,12 @@ export default function SupplierCreate() {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <FormInput
-                                label="Name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                error={errors.name}
-                                id="name"
-                                required
-                            />
-
-                            <FormInput
                                 label="Company Name"
                                 value={data.company_name}
                                 onChange={(e) => setData('company_name', e.target.value)}
                                 error={errors.company_name}
                                 id="company_name"
+                                required
                             />
 
                             <div className="grid gap-6 md:grid-cols-2">

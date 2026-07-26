@@ -15,7 +15,7 @@ class StorePurchaseRequest extends FormRequest
     {
         return [
             'supplier_id' => ['required', 'exists:suppliers,id'],
-            'purchase_number' => ['required', 'string', 'max:50'],
+            'purchase_number' => ['nullable', 'string', 'max:50'],
             'purchase_date' => ['required', 'date'],
             'status' => ['sometimes', 'required', 'string', 'in:pending,received,cancelled'],
             'notes' => ['nullable', 'string', 'max:1000'],

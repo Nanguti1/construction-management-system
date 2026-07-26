@@ -1,26 +1,22 @@
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FormInput } from '@/components/form/form-input';
-import { FormDate } from '@/components/form/form-date';
-import { FormSelect } from '@/components/form/form-select';
-import { ArrowLeft, BarChart3, Download } from 'lucide-react';
+import { ArrowLeft, BarChart3, Download, DollarSign, FileText, Package } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
-export default function PurchaseReport() {
-    const supplierOptions = [
-        { value: '', label: 'All Suppliers' },
-        { value: '1', label: 'Supplier 1' },
-        { value: '2', label: 'Supplier 2' },
-    ];
+interface PurchaseReportProps {
+    report: {
+        total_purchases: number;
+        purchase_count: number;
+        purchases: any[];
+    };
+    filters: {
+        start_date: string;
+        end_date: string;
+    };
+}
 
-    const statusOptions = [
-        { value: '', label: 'All Statuses' },
-        { value: 'completed', label: 'Completed' },
-        { value: 'pending', label: 'Pending' },
-        { value: 'cancelled', label: 'Cancelled' },
-    ];
-
+export default function PurchaseReport({ report, filters }: PurchaseReportProps) {
     return (
         <>
             <Head title="Purchase Report" />
@@ -35,7 +31,7 @@ export default function PurchaseReport() {
                         </Link>
                         <h1 className="text-3xl font-bold tracking-tight mt-2">Purchase Report</h1>
                         <p className="text-muted-foreground">
-                            View and analyze purchase data
+                            View and analyze purchase data from {filters.start_date} to {filters.end_date}
                         </p>
                     </div>
                     <Button>
@@ -44,57 +40,81 @@ export default function PurchaseReport() {
                     </Button>
                 </div>
 
+                <div className="grid gap-4 md:grid-cols-3">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total Purchases
+                            </CardTitle>
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                ${parseFloat(report.total_purchases || 0).toFixed(2)}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total Purchase Orders
+                            </CardTitle>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {report.purchase_count}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Average Order Value
+                            </CardTitle>
+                            <Package className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                ${report.purchase_count > 0 ? (parseFloat(report.total_purchases || 0) / report.purchase_count).toFixed(2) : '0.00'}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BarChart3 className="h-5 w-5" />
-                            Report Filters
+                            Purchase Details
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid gap-6 md:grid-cols-4">
-                            <FormDate
-                                label="Start Date"
-                                id="start_date"
-                            />
-
-                            <FormDate
-                                label="End Date"
-                                id="end_date"
-                            />
-
-                            <FormSelect
-                                label="Supplier"
-                                options={supplierOptions}
-                                id="supplier"
-                            />
-
-                            <FormSelect
-                                label="Status"
-                                options={statusOptions}
-                                id="status"
-                            />
-                        </div>
-
-                        <div className="flex justify-end gap-4 mt-6">
-                            <Button variant="outline">
-                                Reset Filters
-                            </Button>
-                            <Button>
-                                Generate Report
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Report Results</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-center py-12 text-muted-foreground">
-                            <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                            <p>Select filters and generate a report to view results</p>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left p-2">PO #</th>
+                                        <th className="text-left p-2">Supplier</th>
+                                        <th className="text-left p-2">Date</th>
+                                        <th className="text-left p-2">Status</th>
+                                        <th className="text-right p-2">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {report.purchases.map((purchase) => (
+                                        <tr key={purchase.id} className="border-b">
+                                            <td className="p-2">{purchase.purchase_number}</td>
+                                            <td className="p-2">{purchase.supplier?.name || 'N/A'}</td>
+                                            <td className="p-2">{new Date(purchase.purchase_date).toLocaleDateString()}</td>
+                                            <td className="p-2 capitalize">{purchase.status}</td>
+                                            <td className="p-2 text-right">${parseFloat(purchase.grand_total || 0).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </CardContent>
                 </Card>

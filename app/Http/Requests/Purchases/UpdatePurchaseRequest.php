@@ -8,14 +8,14 @@ class UpdatePurchaseRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->user()->can('update purchases');
+        return auth()->user()->can('edit purchases');
     }
 
     public function rules(): array
     {
         return [
             'supplier_id' => ['sometimes', 'required', 'exists:suppliers,id'],
-            'purchase_number' => ['sometimes', 'required', 'string', 'max:50'],
+            'purchase_number' => ['nullable', 'string', 'max:50'],
             'purchase_date' => ['sometimes', 'required', 'date'],
             'status' => ['sometimes', 'required', 'string', 'in:pending,received,cancelled'],
             'notes' => ['nullable', 'string', 'max:1000'],

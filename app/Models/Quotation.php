@@ -2,22 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Quotation extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'customer_id',
         'quotation_number',
-        'date',
+        'quotation_date',
         'expiry_date',
         'status',
         'notes',
+        'subtotal',
+        'tax',
+        'discount',
+        'grand_total',
         'created_by',
         'updated_by',
     ];
@@ -25,7 +29,7 @@ class Quotation extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'date',
+            'quotation_date' => 'date',
             'expiry_date' => 'date',
         ];
     }

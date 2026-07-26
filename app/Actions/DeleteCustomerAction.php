@@ -13,11 +13,11 @@ class DeleteCustomerAction
         return DB::transaction(function () use ($customer) {
             $customerId = $customer->id;
             $result = $customer->delete();
-            
+
             if ($result) {
                 Log::info('Customer deleted', ['customer_id' => $customerId]);
             }
-            
+
             return $result;
         });
     }

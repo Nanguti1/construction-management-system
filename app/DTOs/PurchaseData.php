@@ -6,7 +6,7 @@ class PurchaseData
 {
     public function __construct(
         public readonly string $supplierId,
-        public readonly string $purchaseNumber,
+        public readonly ?string $purchaseNumber,
         public readonly string $purchaseDate,
         public readonly string $status,
         public readonly ?string $notes,
@@ -16,13 +16,13 @@ class PurchaseData
     public static function fromArray(array $data): self
     {
         $items = array_map(
-            fn($item) => PurchaseItemData::fromArray($item),
+            fn ($item) => PurchaseItemData::fromArray($item),
             $data['items'] ?? []
         );
 
         return new self(
             supplierId: $data['supplier_id'],
-            purchaseNumber: $data['purchase_number'],
+            purchaseNumber: $data['purchase_number'] ?? null,
             purchaseDate: $data['purchase_date'],
             status: $data['status'] ?? 'pending',
             notes: $data['notes'] ?? null,
@@ -38,7 +38,7 @@ class PurchaseData
             'purchase_date' => $this->purchaseDate,
             'status' => $this->status,
             'notes' => $this->notes,
-            'items' => array_map(fn($item) => $item->toArray(), $this->items),
+            'items' => array_map(fn ($item) => $item->toArray(), $this->items),
         ];
     }
 }

@@ -1,0 +1,10 @@
+{
+    "agents": [
+        "cursor"
+    ],
+    "cloud": false,
+    "guidelines": true,
+    "packages": [
+        "spatie/laravel-permission"
+    ]
+}

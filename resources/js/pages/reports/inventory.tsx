@@ -1,24 +1,26 @@
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FormInput } from '@/components/form/form-input';
-import { FormSelect } from '@/components/form/form-select';
-import { ArrowLeft, BarChart3, Download } from 'lucide-react';
+import { ArrowLeft, BarChart3, Download, Package, Box, AlertTriangle } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
-export default function InventoryReport() {
-    const categoryOptions = [
-        { value: '', label: 'All Categories' },
-        { value: '1', label: 'Category 1' },
-        { value: '2', label: 'Category 2' },
-    ];
+interface InventoryReportProps {
+    report: {
+        total_products: number;
+        stock_levels: Array<{
+            product: any;
+            current_stock: number;
+        }>;
+    };
+}
 
-    const statusOptions = [
-        { value: '', label: 'All Statuses' },
-        { value: 'active', label: 'Active' },
-        { value: 'inactive', label: 'Inactive' },
-        { value: 'low_stock', label: 'Low Stock' },
-    ];
+export default function InventoryReport({ report }: InventoryReportProps) {
+    const lowStockProducts = report.stock_levels.filter(
+        (item) => item.current_stock < 10
+    );
+    const outOfStockProducts = report.stock_levels.filter(
+        (item) => item.current_stock <= 0
+    );
 
     return (
         <>
@@ -43,53 +45,103 @@ export default function InventoryReport() {
                     </Button>
                 </div>
 
+                <div className="grid gap-4 md:grid-cols-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total Products
+                            </CardTitle>
+                            <Package className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {report.total_products}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                In Stock
+                            </CardTitle>
+                            <Box className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {report.stock_levels.filter((item) => item.current_stock > 0).length}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Low Stock
+                            </CardTitle>
+                            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-yellow-600">
+                                {lowStockProducts.length}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Out of Stock
+                            </CardTitle>
+                            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-red-600">
+                                {outOfStockProducts.length}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BarChart3 className="h-5 w-5" />
-                            Report Filters
+                            Stock Levels
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid gap-6 md:grid-cols-3">
-                            <FormSelect
-                                label="Category"
-                                options={categoryOptions}
-                                id="category"
-                            />
-
-                            <FormSelect
-                                label="Status"
-                                options={statusOptions}
-                                id="status"
-                            />
-
-                            <FormInput
-                                label="Product Name/SKU"
-                                id="search"
-                                placeholder="Search products..."
-                            />
-                        </div>
-
-                        <div className="flex justify-end gap-4 mt-6">
-                            <Button variant="outline">
-                                Reset Filters
-                            </Button>
-                            <Button>
-                                Generate Report
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Report Results</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-center py-12 text-muted-foreground">
-                            <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                            <p>Select filters and generate a report to view results</p>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left p-2">Product</th>
+                                        <th className="text-left p-2">SKU</th>
+                                        <th className="text-left p-2">Category</th>
+                                        <th className="text-right p-2">Current Stock</th>
+                                        <th className="text-right p-2">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {report.stock_levels.map((item) => (
+                                        <tr key={item.product.id} className="border-b">
+                                            <td className="p-2">{item.product.name}</td>
+                                            <td className="p-2">{item.product.sku}</td>
+                                            <td className="p-2">{item.product.category?.name || 'N/A'}</td>
+                                            <td className="p-2 text-right">{item.current_stock}</td>
+                                            <td className="p-2 text-right">
+                                                {item.current_stock <= 0 ? (
+                                                    <span className="text-red-600 font-medium">Out of Stock</span>
+                                                ) : item.current_stock < 10 ? (
+                                                    <span className="text-yellow-600 font-medium">Low Stock</span>
+                                                ) : (
+                                                    <span className="text-green-600 font-medium">In Stock</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </CardContent>
                 </Card>

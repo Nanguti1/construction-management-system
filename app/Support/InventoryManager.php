@@ -6,25 +6,25 @@ use App\Enums\StockMovementType;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Product;
 use App\Models\StockMovement;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 class InventoryManager
 {
     public function getCurrentStock(string $productId): int
     {
         $movements = StockMovement::where('product_id', $productId)->get();
-        
+
         $total = 0;
         foreach ($movements as $movement) {
             $type = StockMovementType::from($movement->movement_type);
-            
+
             if ($type->increasesStock()) {
                 $total += $movement->quantity;
             } elseif ($type->decreasesStock()) {
                 $total -= $movement->quantity;
             }
         }
-        
+
         return max(0, $total);
     }
 
@@ -35,10 +35,10 @@ class InventoryManager
 
     public function validateStockAvailability(string $productId, int $requiredQuantity): void
     {
-        if (!$this->hasSufficientStock($productId, $requiredQuantity)) {
+        if (! $this->hasSufficientStock($productId, $requiredQuantity)) {
             $product = Product::find($productId);
             $available = $this->getCurrentStock($productId);
-            
+
             throw new InsufficientStockException(
                 $product?->name ?? 'Unknown',
                 $requiredQuantity,
@@ -94,7 +94,7 @@ class InventoryManager
         ?string $notes = null
     ): StockMovement {
         $this->validateStockAvailability($productId, $quantity);
-        
+
         return $this->recordMovement(
             $productId,
             $quantity,
@@ -172,25 +172,26 @@ class InventoryManager
         );
     }
 
-    public function getProductMovements(string $productId, ?int $limit = null): \Illuminate\Database\Eloquent\Collection
+    public function getProductMovements(string $productId, ?int $limit = null): Collection
     {
         $query = StockMovement::where('product_id', $productId)
             ->orderBy('movement_date', 'desc')
             ->orderBy('created_at', 'desc');
-            
+
         if ($limit) {
             $query->limit($limit);
         }
-        
+
         return $query->get();
     }
 
-    public function getLowStockProducts(int $threshold = 10): \Illuminate\Database\Eloquent\Collection
+    public function getLowStockProducts(int $threshold = 10): Collection
     {
         return Product::where('is_active', true)
             ->get()
             ->filter(function ($product) use ($threshold) {
                 $currentStock = $this->getCurrentStock($product->id);
+
                 return $currentStock <= $product->minimum_stock || $currentStock < $threshold;
             });
     }

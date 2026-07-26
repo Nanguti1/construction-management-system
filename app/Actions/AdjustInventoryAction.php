@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\DTOs\StockAdjustmentData;
 use App\Enums\StockMovementType;
+use App\Models\StockMovement;
 use App\Support\InventoryManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,11 +15,11 @@ class AdjustInventoryAction
         private InventoryManager $inventoryManager
     ) {}
 
-    public function execute(StockAdjustmentData $data): \App\Models\StockMovement
+    public function execute(StockAdjustmentData $data): StockMovement
     {
         return DB::transaction(function () use ($data) {
             $movementType = StockMovementType::from($data->movementType);
-            
+
             // Validate if it's a stock decrease
             if ($movementType->decreasesStock()) {
                 $this->inventoryManager->validateStockAvailability(

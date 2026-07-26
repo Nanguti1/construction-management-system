@@ -10,6 +10,7 @@ class SupplierData
         public readonly ?string $phone,
         public readonly ?string $email,
         public readonly ?string $address,
+        public readonly ?string $taxPin,
         public readonly ?string $notes,
         public readonly bool $isActive,
     ) {}
@@ -22,6 +23,7 @@ class SupplierData
             phone: $data['phone'] ?? null,
             email: $data['email'] ?? null,
             address: $data['address'] ?? null,
+            taxPin: $data['tax_pin'] ?? null,
             notes: $data['notes'] ?? null,
             isActive: $data['is_active'] ?? true,
         );
@@ -35,6 +37,7 @@ class SupplierData
             'phone' => $this->phone,
             'email' => $this->email,
             'address' => $this->address,
+            'tax_pin' => $this->taxPin,
             'notes' => $this->notes,
             'is_active' => $this->isActive,
         ];

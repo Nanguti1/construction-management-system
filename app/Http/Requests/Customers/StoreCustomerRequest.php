@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Customers;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreCustomerRequest extends FormRequest
 {

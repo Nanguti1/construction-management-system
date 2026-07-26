@@ -27,6 +27,14 @@ interface Product {
     selling_price: number;
 }
 
+interface InvoiceItem {
+    product_id: string;
+    quantity: number;
+    unit_price: string;
+    discount: number;
+    tax: number;
+}
+
 interface Props {
     customers: Customer[];
     quotations: Quotation[];
@@ -34,8 +42,8 @@ interface Props {
 }
 
 export default function InvoiceCreate({ customers, quotations, products }: Props) {
-    const [items, setItems] = useState([
-        { product_id: '', quantity: 1, unit_price: 0, discount: 0, tax: 0 }
+    const [items, setItems] = useState<InvoiceItem[]>([
+        { product_id: '', quantity: 1, unit_price: '', discount: 0, tax: 0 }
     ]);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -49,7 +57,7 @@ export default function InvoiceCreate({ customers, quotations, products }: Props
     });
 
     const addItem = () => {
-        const newItems = [...items, { product_id: '', quantity: 1, unit_price: 0, discount: 0, tax: 0 }];
+        const newItems = [...items, { product_id: '', quantity: 1, unit_price: '', discount: 0, tax: 0 }];
         setItems(newItems);
         setData('items', newItems);
     };
@@ -63,13 +71,23 @@ export default function InvoiceCreate({ customers, quotations, products }: Props
     const updateItem = (index: number, field: string, value: any) => {
         const newItems = [...items];
         newItems[index] = { ...newItems[index], [field]: value };
+
+        // Auto-fill unit price when product is selected
+        if (field === 'product_id' && value) {
+            const product = products.find(p => p.id.toString() === value);
+            if (product) {
+                newItems[index].unit_price = product.selling_price.toString();
+            }
+        }
+
         setItems(newItems);
         setData('items', newItems);
     };
 
     const calculateTotal = () => {
         return items.reduce((total, item) => {
-            const subtotal = item.quantity * item.unit_price;
+            const unitPrice = parseFloat(item.unit_price) || 0;
+            const subtotal = item.quantity * unitPrice;
             const discount = subtotal * (item.discount / 100);
             const tax = (subtotal - discount) * (item.tax / 100);
             return total + subtotal - discount + tax;
@@ -87,10 +105,9 @@ export default function InvoiceCreate({ customers, quotations, products }: Props
 
     const statusOptions = [
         { value: 'draft', label: 'Draft' },
-        { value: 'sent', label: 'Sent' },
+        { value: 'pending', label: 'Pending' },
         { value: 'paid', label: 'Paid' },
         { value: 'partially_paid', label: 'Partially Paid' },
-        { value: 'overdue', label: 'Overdue' },
         { value: 'cancelled', label: 'Cancelled' },
     ];
 
@@ -217,7 +234,7 @@ export default function InvoiceCreate({ customers, quotations, products }: Props
                                             <FormCurrency
                                                 label="Unit Price"
                                                 value={item.unit_price}
-                                                onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value))}
+                                                onChange={(e) => updateItem(index, 'unit_price', e.target.value)}
                                                 error={errors.items?.[index]?.unit_price}
                                                 id={`unit_price_${index}`}
                                                 required

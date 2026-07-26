@@ -39,7 +39,7 @@ export default function PurchaseShow({ purchase }: Props) {
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this purchase?')) {
-            destroy(edit(purchase.id).url);
+            destroy(`/purchases/${purchase.id}`);
         }
     };
 
@@ -165,7 +165,7 @@ export default function PurchaseShow({ purchase }: Props) {
                                 <span className="text-sm text-muted-foreground">Status:</span>
                                 <span
                                     className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                                        purchase.status === 'completed'
+                                        purchase.status === 'received'
                                             ? 'bg-green-100 text-green-800'
                                             : purchase.status === 'pending'
                                             ? 'bg-yellow-100 text-yellow-800'

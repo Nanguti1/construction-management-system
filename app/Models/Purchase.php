@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Concerns\HasInventoryMovements;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use App\Concerns\HasInventoryMovements;
 
 class Purchase extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids, HasInventoryMovements;
+    use HasFactory, HasInventoryMovements, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'supplier_id',

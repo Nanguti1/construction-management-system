@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Suppliers;
 
 use App\Actions\CreateSupplierAction;
-use App\Actions\UpdateSupplierAction;
 use App\Actions\DeleteSupplierAction;
+use App\Actions\UpdateSupplierAction;
 use App\DTOs\SupplierData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Suppliers\StoreSupplierRequest;
@@ -29,14 +29,14 @@ class SupplierController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('Suppliers/Index', [
+        return Inertia::render('suppliers/index', [
             'suppliers' => $suppliers,
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('Suppliers/Create');
+        return Inertia::render('suppliers/create');
     }
 
     public function store(StoreSupplierRequest $request): RedirectResponse
@@ -54,14 +54,14 @@ class SupplierController extends Controller
             $query->orderBy('purchase_date', 'desc')->limit(10);
         }]);
 
-        return Inertia::render('Suppliers/Show', [
+        return Inertia::render('suppliers/show', [
             'supplier' => $supplier,
         ]);
     }
 
     public function edit(Supplier $supplier): Response
     {
-        return Inertia::render('Suppliers/Edit', [
+        return Inertia::render('suppliers/edit', [
             'supplier' => $supplier,
         ]);
     }

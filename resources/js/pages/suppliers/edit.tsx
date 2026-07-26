@@ -9,7 +9,6 @@ import { index, update, show } from '@/routes/suppliers';
 
 interface Supplier {
     id: number;
-    name: string;
     company_name: string | null;
     phone: string | null;
     email: string | null;
@@ -25,7 +24,6 @@ interface Props {
 
 export default function SupplierEdit({ supplier }: Props) {
     const { data, setData, put, processing, errors } = useForm({
-        name: supplier.name,
         company_name: supplier.company_name || '',
         phone: supplier.phone || '',
         email: supplier.email || '',
@@ -66,20 +64,12 @@ export default function SupplierEdit({ supplier }: Props) {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <FormInput
-                                label="Name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                error={errors.name}
-                                id="name"
-                                required
-                            />
-
-                            <FormInput
                                 label="Company Name"
                                 value={data.company_name}
                                 onChange={(e) => setData('company_name', e.target.value)}
                                 error={errors.company_name}
                                 id="company_name"
+                                required
                             />
 
                             <div className="grid gap-6 md:grid-cols-2">
@@ -108,14 +98,6 @@ export default function SupplierEdit({ supplier }: Props) {
                                 error={errors.address}
                                 id="address"
                                 rows={3}
-                            />
-
-                            <FormInput
-                                label="Tax PIN"
-                                value={data.tax_pin}
-                                onChange={(e) => setData('tax_pin', e.target.value)}
-                                error={errors.tax_pin}
-                                id="tax_pin"
                             />
 
                             <FormTextarea

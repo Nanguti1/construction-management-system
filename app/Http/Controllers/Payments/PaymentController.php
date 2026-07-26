@@ -6,6 +6,7 @@ use App\Actions\RecordPaymentAction;
 use App\DTOs\PaymentData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Payments\StorePaymentRequest;
+use App\Models\Invoice;
 use App\Models\Payment;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -22,16 +23,46 @@ class PaymentController extends Controller
         $payments = Payment::query()
             ->with(['invoice.customer', 'receipt'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id' => $payment->id,
+                    'payment_date' => $payment->payment_date->format('Y-m-d'),
+                    'amount' => $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'reference_number' => $payment->reference_number,
+                    'invoice_number' => $payment->invoice?->invoice_number ?? 'N/A',
+                    'customer_name' => $payment->invoice?->customer?->name ?? 'N/A',
+                ];
+            });
 
-        return Inertia::render('Payments/Index', [
+        return Inertia::render('payments/index', [
             'payments' => $payments,
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('Payments/Create');
+        $invoices = Invoice::query()
+            ->with(['customer', 'payments', 'invoiceItems'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($invoice) {
+                $paidAmount = $invoice->payments->sum('amount');
+                $grandTotal = $invoice->grand_total ?? $invoice->invoiceItems->sum('calculated_line_total');
+
+                return [
+                    'id' => $invoice->id,
+                    'invoice_number' => $invoice->invoice_number,
+                    'customer_name' => $invoice->customer?->name ?? 'N/A',
+                    'outstanding_balance' => $grandTotal - $paidAmount,
+                    'status' => $invoice->status,
+                ];
+            });
+
+        return Inertia::render('payments/create', [
+            'invoices' => $invoices,
+        ]);
     }
 
     public function store(StorePaymentRequest $request): RedirectResponse
@@ -47,7 +78,12 @@ class PaymentController extends Controller
     {
         $payment->load(['invoice.customer', 'receipt']);
 
-        return Inertia::render('Payments/Show', [
+        $payment->invoice_number = $payment->invoice?->invoice_number ?? 'N/A';
+        $payment->customer_name = $payment->invoice?->customer?->name ?? 'N/A';
+        $payment->customer_phone = $payment->invoice?->customer?->phone ?? null;
+        $payment->customer_email = $payment->invoice?->customer?->email ?? null;
+
+        return Inertia::render('payments/show', [
             'payment' => $payment,
         ]);
     }

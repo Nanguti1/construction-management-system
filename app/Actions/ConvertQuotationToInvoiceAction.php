@@ -4,11 +4,9 @@ namespace App\Actions;
 
 use App\DTOs\InvoiceData;
 use App\DTOs\ItemData;
-use App\Enums\InvoiceStatus;
 use App\Enums\QuotationStatus;
 use App\Exceptions\InvalidQuotationException;
 use App\Models\Quotation;
-use App\Support\DocumentNumberGenerator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +20,7 @@ class ConvertQuotationToInvoiceAction
             }
 
             $status = QuotationStatus::from($quotation->status);
-            if (!$status->canBeConvertedToInvoice()) {
+            if (! $status->canBeConvertedToInvoice()) {
                 throw InvalidQuotationException::cannotConvert(
                     "Quotation status '{$status->label()}' does not allow conversion"
                 );
@@ -51,7 +49,7 @@ class ConvertQuotationToInvoiceAction
             );
 
             // Create invoice using the CreateInvoiceAction
-            $createInvoiceAction = new CreateInvoiceAction();
+            $createInvoiceAction = new CreateInvoiceAction;
             $invoice = $createInvoiceAction->execute($invoiceData);
 
             // Update quotation status

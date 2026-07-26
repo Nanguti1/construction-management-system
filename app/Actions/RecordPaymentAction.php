@@ -5,7 +5,6 @@ namespace App\Actions;
 use App\DTOs\PaymentData;
 use App\Enums\InvoiceStatus;
 use App\Exceptions\DuplicateReceiptException;
-use App\Exceptions\InvoiceAlreadyPaidException;
 use App\Exceptions\InvalidPaymentException;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -18,10 +17,10 @@ class RecordPaymentAction
     public function execute(PaymentData $data): Payment
     {
         return DB::transaction(function () use ($data) {
-            $invoice = Invoice::findOrFail($data->invoiceId);
-            
+            $invoice = Invoice::with(['invoiceItems', 'payments'])->findOrFail($data->invoiceId);
+
             $this->validatePayment($invoice, $data->amount);
-            
+
             $payment = Payment::create([
                 'invoice_id' => $data->invoiceId,
                 'payment_date' => $data->paymentDate,
@@ -52,8 +51,8 @@ class RecordPaymentAction
     protected function validatePayment(Invoice $invoice, float $amount): void
     {
         $status = InvoiceStatus::from($invoice->status);
-        
-        if (!$status->canBePaid()) {
+
+        if (! $status->canBePaid()) {
             throw InvalidPaymentException::invoiceCannotAcceptPayment(
                 $invoice->invoice_number,
                 $status->label()
@@ -61,7 +60,7 @@ class RecordPaymentAction
         }
 
         $outstandingBalance = $this->getOutstandingBalance($invoice);
-        
+
         if ($amount > $outstandingBalance) {
             throw InvalidPaymentException::exceedsBalance(
                 $invoice->invoice_number,
@@ -73,15 +72,16 @@ class RecordPaymentAction
 
     protected function getOutstandingBalance(Invoice $invoice): float
     {
-        $total = $invoice->invoiceItems->sum('line_total');
+        $grandTotal = $invoice->grand_total ?? $invoice->invoiceItems->sum('calculated_line_total');
         $paid = $invoice->payments->sum('amount');
-        return $total - $paid;
+
+        return $grandTotal - $paid;
     }
 
     protected function updateInvoiceStatus(Invoice $invoice): void
     {
         $outstandingBalance = $this->getOutstandingBalance($invoice);
-        
+
         if ($outstandingBalance <= 0) {
             $invoice->update([
                 'status' => InvoiceStatus::PAID->value,
